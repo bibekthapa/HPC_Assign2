@@ -1,9 +1,11 @@
 #include <iostream>
 #include<ctime>
+#include<fstream>
 
 using namespace std;
-const int m=10,n=10;
+const int m=500,n=500;
 int comparisonArray[m][n];
+int tempX,tempY;
 
 
 class Point
@@ -31,25 +33,30 @@ public:
 	}
 };
 
-bool isMovable(int x, int y){
-	bool isMovable = false;
-	int xmin = x - 1;
-	int ymin = y - 1;
-	int xmax = x + 1;
-	int ymax = y + 1;
-	if (xmin < 0) {xmin = 0;}
-	if (ymin < 0) {ymin = 0;}
-	if (xmax > m - 1) {xmax = m - 1;}
-	if (ymax > m - 1) {ymax = m - 1;}
+bool isAttached(int x, int y){
+	bool isAttached = false;
+	int x_min = x - 1;
+	int y_min = y - 1;
+	int x_max = x + 1;
+	int y_max = y + 1;
+	if (x_max > m - 1) {x_max = m - 1;}
+	if (y_max > m - 1) {y_max = m - 1;}
+	if (x_min < 0) {
+	    x_min = 0;
+    }
+	if (y_min < 0)
+        {
+            y_min = 0;
+    }
 
-	for (int i = xmin; i <= xmax; i++){
-		for (int j = ymin; j <= ymax; j++ ){
+	for (int i = x_min; i <= x_max; i++){
+		for (int j = y_min; j <= y_max; j++ ){
 			if (comparisonArray[i][j] == 1){
-				isMovable = true;
+				isAttached = true;
 			}
 		}
 	}
-	return isMovable;
+	return isAttached;
 }
 
 
@@ -119,34 +126,16 @@ int update(int x)
 
 
 
-int main()
+void compute(Point p)
 {
 
-	int number_of_particles=1000;
-	for(int i=0;i<m;i++){
-		for(int j=0;j<n;j++){
-			comparisonArray[i][j]=0;
-		}
-		cout<<"\n";
-	}
-
-	int centerX=(m/2);
-	int centerY=(n/2);
-	comparisonArray[centerX][centerY]=1;
-    ////        srand(seed);
-	int random_integer = 1+rand()%m;
-	int tempX,tempY;
-
-	for(int i=0;i<number_of_particles;i++){
-    //            seed=i+1;
-		Point p(2,0);
-		tempX=p.getX();
+        tempX=p.getX();
 		tempY=p.getY();
 		int flag=0;
 
 		while(flag!=1){
 
-			if(isMovable(tempX,tempY)==true)
+			if(isAttached(tempX,tempY)==true)
 			{
 				comparisonArray[tempX][tempY]=1;
 				flag=1;
@@ -162,6 +151,45 @@ int main()
 
 	}
 
+
+
+int main()
+{
+
+	int number_of_particles=10000;
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++){
+			comparisonArray[i][j]=0;
+		}
+		cout<<"\n";
+	}
+
+	int centerX=(m/2);
+	int centerY=(n/2);
+	comparisonArray[centerX][centerY]=1;
+
+	int random_integer = 1+rand()%m;
+	srand(time(NULL));
+    int random_int = rand()%m;
+    cout<<random_int<<endl;
+
+
+    Point p(random_int,0);
+    Point q(0,random_int);
+    Point r(random_int,m-1);
+    Point s(m-1,random_int);
+
+
+
+
+	for(int i=0;i<number_of_particles;i++){
+
+		compute(p);
+		compute(q);
+		compute(r);
+		compute(s);
+	}
+
 	for(int i=0;i<m;i++){
 		for(int j=0;j<n;j++){
 			cout<<comparisonArray[i][j]<<"\t";
@@ -169,5 +197,20 @@ int main()
 		cout<<"\n";
 	}
 
-	return 0;
+	ofstream myfile;
+    myfile.open ("matrix_output.csv",fstream::out);
+    for (int i = 0; i < m ; i++) {
+        for (int j = 0; j < m; j++){
+            myfile << comparisonArray[i][j];
+            if (j < m - 1) {
+                myfile << ",";
+            }
+        }
+        myfile << endl;
+
+    }
+    myfile.close();
+    return 0;
+
+
 }
