@@ -1,9 +1,10 @@
 #include <iostream>
 #include<ctime>
 #include<fstream>
+#include<chrono>
 
 using namespace std;
-const int m=500,n=500;
+const int m=20,n=20;
 int comparisonArray[m][n];
 int tempX,tempY;
 
@@ -155,7 +156,8 @@ void compute(Point p)
 
 int main()
 {
-
+    cout << chrono::high_resolution_clock::period::den << " ticks/sec" << endl;
+    auto start_time = chrono::high_resolution_clock::now();
 	int number_of_particles=10000;
 	for(int i=0;i<m;i++){
 		for(int j=0;j<n;j++){
@@ -189,6 +191,9 @@ int main()
 		compute(r);
 		compute(s);
 	}
+
+	auto end_time = chrono::high_resolution_clock::now();
+	cout << chrono::duration_cast<chrono::microseconds>(end_time - start_time).count() << " us" << endl;
 
 	for(int i=0;i<m;i++){
 		for(int j=0;j<n;j++){
